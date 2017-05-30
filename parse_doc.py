@@ -1,6 +1,10 @@
-import CharLSTM
 from pycorenlp import StanfordCoreNLP
-from hobbs import *
+from nltk.tokenize import sent_tokenize
+
+# The following imports are for CharLSTM -- change your path accordingly
+CharLSTM_PATH = '/home/ashbylepoc/PycharmProjects/CharLSTM/'
+import sys; sys.path.append(CharLSTM_PATH)
+from lib_model.char_lstm import *
 
 try:
     nlp = StanfordCoreNLP('http://localhost:9000')
@@ -14,41 +18,53 @@ except:
 assert SERVER_RUNNING == True, "Download the server files at: http://nlp.stanford.edu/software/stanford-" \
                                "corenlp-full-2016-10-31.zip"
 
-test = 'Mr. BLodwij is interested in knowing more about this company, but he is lost.'
-
 def print_tree(output):
     print(output['sentences'][0]['parse'])
     return True
 
+def get_rep_mention(coreference):
+    for reference in coreference:
+        if reference['isRepresentativeMention'] == True:
+            pos = (reference['startIndex'], reference['headIndex'])
+            text = reference['text']
+            return text, pos
+
 def parse_sentence(sentence):
     """ sentence --> named-entity chunked tree """
-    output = nlp.annotate(sentence, properties={'annotators': 'tokenize, ssplit, pos, depparse, parse,',
+    try:
+        output = nlp.annotate(sentence, properties={'annotators':   'tokenize, ssplit, pos,'
+                                                                    ' lemma, ner, parse',
+                                                    'outputFormat': 'json'})
+        # print_tree(output)
+        return Tree.fromstring(output['sentences'][0]['parse'])
+    except TypeError as e:
+        import pdb; pdb.set_trace()
+
+def coreference_resolution(sentence):
+    # coreference resolution
+    output = nlp.annotate(sentence, properties={'annotators':   'coref',
                                             'outputFormat': 'json'})
-    print_tree(output)
-    return Tree.fromstring(output['sentences'][0]['parse'])
+    tokens = word_tokenize(sentence)
+    coreferences = output['corefs']
+    entity_keys = coreferences.keys()
+    for k in entity_keys:
+        # skip non PERSON NP
+        if coreferences[k][0]['gender'] == 'MALE' or coreferences[k][0]['gender'] == 'FEMALE':
+            rep_mention, pos = get_rep_mention(coreferences[k])
+            for reference in coreferences[k]:
+                if not reference['isRepresentativeMention']:
+                    start, end = reference['startIndex'] - 1, reference['headIndex'] - 1
+                    if start == end:
+                        tokens[start] = rep_mention
+                    else:
+                        tokens[start] = rep_mention
+                        del tokens[start + 1: end]
 
-def anaphora_resolution(tree):
-    """ Convert pronouns to their respective noun """
-    # Get a list of all the pronouns to be resolved
-    # TODO: Discard non-relevant entities
-    pronouns = find_pronouns(tree)
-    entity_positions = []
-
-    for prp in pronouns:
-        # Change the pronoun for the noun found with Hobbs' algo
-        # e.g. Mr. blah blah is here, but he is mad.
-        # ---> Mr. blah blah is here but Mr. blah blah is mad
-        _, noun = hobbs([tree], prp)
-        tree[prp] = tree[noun]
-        entity_positions.append(prp)
-        if not noun in entity_positions:
-            entity_positions.append(noun)
-
-    return tree, entity_positions
+    sentence = ' '.join(tokens)
+    return sentence.encode('utf-8')
 
 def tree_to_str(tree):
     return ' '.join([w for w in tree.leaves()])
-
 
 def get_subtrees(tree):
     """ Return chunked sentences """
@@ -60,47 +76,87 @@ def get_subtrees(tree):
         for child in node:
             if isinstance(child, nltk.Tree):
                 queue.put(child)
-        if "S" in node.label():
+        if node.label() == "S":
             # if childs are (respectively) 'NP' and 'VP'
             # convert subtree to string, else keep looking
+
+            # TODO: MAKE SURE NP AND VP ARE PERSONS
             child_labels = [child.label() for child in node]
 
             if "NP" in child_labels and "VP" in child_labels:
                 sentence = tree_to_str(node)
                 for child in node:
                     if child.label() == "NP":
-                        noun = child
-                subtrees.append((tree_to_str(noun), sentence))
+                        # look for NNP
+                        subchild_labels = [subchild.label() for subchild in child]
+                        if "NNP" in subchild_labels:
+                            noun = ""
+                            for subchild in child:
+                                if subchild.label() == "NNP":
+                                    noun = ' '.join([noun, subchild.leaves()[0]])
 
+                            subtrees.append((noun, sentence))
     return subtrees
 
+def flatten(list):
+    return [val for sublist in list for val in sublist]
 
-"""
+def parse_doc(document):
+    """ Extract relevant entities in a document """
+    print('Tokenizing sentences...')
+    sentences = sent_tokenize(document)
+    print('Done!')
+    # Context of all named entities
+    ne_context = []
+    for sentence in sentences:
+        # change pronouns to their respective nouns
+        print('Anaphora resolution for sentence: %s' % sentence)
+        tree = parse_sentence(coreference_resolution(sentence))
+        print('Done!')
 
+        # get context for each noun
+        print('Named Entity Clustering:')
+        context = get_subtrees(tree)
+        for n, s in context:
+            print('%s' % s)
+        ne_context.append(context)
+    return flatten(ne_context)
 
+def init_dict(contexts):
+    dict = {}
+    for k, _ in contexts:
+        if not k in dict:
+            dict[k] = None
+    return dict
 
+def load_model():
+    assert os.path.exists(CharLSTM_PATH), 'Did you forget to change the path to CharLSTM?'
+    network = LSTM()
+    network.build(training=False)
+    return network
 
-from CharLSTM.lib import data_utils
-from CharLSTM.lib_model import char_lstm
-network = char_lstm.LSTM()
-network.build()
-from parse_doc import *
-tree = anaphora_resolution(parse_sentence(test))
-st = get_subtrees(tree[0])
-sentences = [s[1] for s in st]
-tt = network.categorize_sentences(sentences)
-"""
+def get_sentiment(document, network):
+    """ Create a dict of every entities with their associated sentiment """
+    print('Parsing Document...')
+    contexts = parse_doc(document)
+    print('Done!')
+    entities = init_dict(contexts)
+    sentences = [sentence.encode('utf-8') for _, sentence in contexts]
+    predictions = network.categorize_document(sentences)
 
+    for i, c in enumerate(contexts):
+        key = c[0]
+        if entities[key] != None:
+            entities[key] += (predictions[0][i][0] - predictions[0][i][1])
+            entities[key] /= 2
+        else:
+            entities[key] = (predictions[0][i][0] - predictions[0][i][1])
 
+    for e in entities.keys():
+        print('Entity: %s -- sentiment: %s' % (e, entities[e]))
 
-
-
-
-
-
-
-
-
-
-
-
+if __name__ == '__main__':
+    text = 'Jean is really sad, but Adam is the happiest guy ever'
+    network = LSTM()
+    network.build()
+    get_sentiment(text, network)
