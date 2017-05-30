@@ -1,3 +1,10 @@
+# This code assumes you are using CharLSTM from https://github.com/charlesashby/CharLSTM
+# and the Stanford CoreNLP server. 
+#
+# Results for sentence: Jean is really sad, but Adam is the happiest guy ever
+# Entity:  Jean -- sentiment: -0.197092 (neg)
+# Entity:  Adam -- sentiment: 0.885632  (pos)
+
 from pycorenlp import StanfordCoreNLP
 from nltk.tokenize import sent_tokenize
 
