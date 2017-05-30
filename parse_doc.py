@@ -87,7 +87,7 @@ def get_subtrees(tree):
             # if childs are (respectively) 'NP' and 'VP'
             # convert subtree to string, else keep looking
 
-            # TODO: MAKE SURE NP AND VP ARE PERSONS
+            # TODO: MAKE SURE NP IS A PERSON
             child_labels = [child.label() for child in node]
 
             if "NP" in child_labels and "VP" in child_labels:
