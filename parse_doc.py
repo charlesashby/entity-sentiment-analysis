@@ -75,14 +75,18 @@ def tree_to_str(tree):
 
 def get_subtrees(tree):
     """ Return chunked sentences """
+    
     subtrees = []
     queue = Queue.Queue()
     queue.put(tree)
+    
     while not queue.empty():
         node = queue.get()
+        
         for child in node:
             if isinstance(child, nltk.Tree):
                 queue.put(child)
+                
         if node.label() == "S":
             # if childs are (respectively) 'NP' and 'VP'
             # convert subtree to string, else keep looking
