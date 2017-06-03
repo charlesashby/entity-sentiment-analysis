@@ -50,7 +50,7 @@ def parse_sentence(sentence):
 def coreference_resolution(sentence):
     # coreference resolution
     output = nlp.annotate(sentence, properties={'annotators':   'coref',
-                                            'outputFormat': 'json'})
+                                                'outputFormat': 'json'})
     tokens = word_tokenize(sentence)
     coreferences = output['corefs']
     entity_keys = coreferences.keys()
