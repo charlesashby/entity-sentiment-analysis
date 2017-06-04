@@ -7,6 +7,7 @@
 
 from pycorenlp import StanfordCoreNLP
 from nltk.tokenize import sent_tokenize
+from nltk import Tree
 
 # The following imports are for CharLSTM -- change your path accordingly
 CharLSTM_PATH = '/home/ashbylepoc/PycharmProjects/CharLSTM/'
