@@ -85,7 +85,7 @@ def get_subtrees(tree):
         node = queue.get()
         
         for child in node:
-            if isinstance(child, nltk.Tree):
+            if isinstance(child, Tree):
                 queue.put(child)
                 
         if node.label() == "S":
