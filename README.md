@@ -11,11 +11,20 @@ This code assume you have the following directory structure, where CharLSTM is t
 - Main
 -- CharLSTM
 -- news-sentiment-analysis
+--- 
 ```
 
 ## Exemple Usage
 
-You can use this script has follows to perform anaphora resolution & sentiment analysis on the sentence "Jean is really sad, but Adam is the happiest guy ever".
+First, download the Stanford-CoreNLP server files at this [page](http://nlp.stanford.edu/software/stanford-corenlp-full-2016-10-31.zip). And type the following commands in a terminal to start it.
+
+```
+# Start the Stanford-CoreNLP server
+cd news-sentiment-analysis/stanford-corenlp-*
+java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 15000
+```
+
+Then, you can use this script to perform anaphora resolution & sentiment analysis on any sentence by modifying `parse_doc.py`. As an example, here's the result by running this script on the sentence: "Jean is really sad, but Adam is the happiest guy ever".
 
 ```
 python news-sentiment-analysis/parse_doc.py
@@ -25,3 +34,5 @@ python news-sentiment-analysis/parse_doc.py
 >>> Entity:  Jean -- sentiment: -0.2897535
 >>> Entity:  Adam -- sentiment: 0.94538456
 ```
+
+You can read the full blog post [here](https://charlesashby.github.io/2017/06/05/sentiment-analysis-with-char-lstm/).
