@@ -24,7 +24,7 @@ cd news-sentiment-analysis/stanford-corenlp-*
 java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 15000
 ```
 
-Then, you can use this script to perform anaphora resolution & sentiment analysis on any sentence by modifying `parse_doc.py`. As an example, here's the result by running this script on the sentence: "Jean is really sad, but Adam is the happiest guy ever".
+Then, you can use this script to perform anaphora resolution, entity extraction & sentiment analysis on any sentence by modifying `parse_doc.py`. As an example, here's the result by running this script on the sentence: "Jean is really sad, but Adam is the happiest guy ever".
 
 ```
 python news-sentiment-analysis/parse_doc.py
