@@ -1,4 +1,4 @@
-# Sentiment Analysis on Extracted Entities from Unstructured Text
+# Sentiment Analysis on Extracted Entities 
 Various ops for handling several entities in a document, performs anaphora resolution, clustering, etc..
 
 ## Requirements
