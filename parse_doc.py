@@ -154,7 +154,7 @@ def get_sentiment(document, network):
     print('Done!')
     entities = init_dict(contexts)
     sentences = [sentence.encode('utf-8') for _, sentence in contexts]
-    predictions = network.categorize_document(sentences)
+    predictions = network.predict_sentences(sentences)
 
     for i, c in enumerate(contexts):
         key = c[0]
