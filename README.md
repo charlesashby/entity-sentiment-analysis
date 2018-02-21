@@ -29,6 +29,7 @@ Then, you can use this script to perform anaphora resolution, entity extraction 
 ```
 python news-sentiment-analysis/parse_doc.py
 
+>>> Processing sentence: Jean is really sad, but Adam is the happiest guy ever
 >>> Sentence: 0,Jean is really sad , yielded results (pos/neg): 0.35512/0.64488, prediction: neg
 >>> Sentence: 0,Adam is the happiest guy ever , yielded results (pos/neg): 0.97269/0.02731, prediction: pos
 >>> Entity:  Jean -- sentiment: -0.2897535
