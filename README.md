@@ -20,8 +20,8 @@ You can use this script has follows to perform anaphora resolution & sentiment a
 ```
 python news-sentiment-analysis/parse_doc.py
 
->>>Sentence: 0,Jean is really sad , yielded results (pos/neg): 0.35512/0.64488, prediction: neg
->>>Sentence: 0,Adam is the happiest guy ever , yielded results (pos/neg): 0.97269/0.02731, prediction: pos
->>>Entity:  Jean -- sentiment: -0.2897535
->>>Entity:  Adam -- sentiment: 0.94538456
+>>> Sentence: 0,Jean is really sad , yielded results (pos/neg): 0.35512/0.64488, prediction: neg
+>>> Sentence: 0,Adam is the happiest guy ever , yielded results (pos/neg): 0.97269/0.02731, prediction: pos
+>>> Entity:  Jean -- sentiment: -0.2897535
+>>> Entity:  Adam -- sentiment: 0.94538456
 ```
