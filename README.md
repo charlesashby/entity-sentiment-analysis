@@ -11,7 +11,7 @@ This code assume you have the following directory structure, where CharLSTM is t
 - Main
 -- CharLSTM
 -- news-sentiment-analysis
---- 
+--- stanford-corenlp-full-2016-10-31
 ```
 
 ## Exemple Usage
