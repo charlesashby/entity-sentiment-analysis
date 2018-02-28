@@ -10,7 +10,7 @@ This code assume you have the following directory structure, where CharLSTM is t
 ```
 - Main
 -- CharLSTM
--- news-sentiment-analysis
+-- entity-sentiment-analysis
 --- stanford-corenlp-full-2016-10-31
 ```
 
@@ -20,14 +20,14 @@ First, download the Stanford-CoreNLP server files at this [page](http://nlp.stan
 
 ```
 # Start the Stanford-CoreNLP server
-cd news-sentiment-analysis/stanford-corenlp-*
+cd entity-sentiment-analysis/stanford-corenlp-*
 java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 15000
 ```
 
 Then, you can use this script to perform anaphora resolution, entity extraction & sentiment analysis on any sentence by modifying `parse_doc.py`. As an example, here's the result by running this script on the sentence: "Jean is really sad, but Adam is the happiest guy ever".
 
 ```
-python news-sentiment-analysis/parse_doc.py
+python entity-sentiment-analysis/parse_doc.py
 
 >>> Processing sentence: Jean is really sad, but Adam is the happiest guy ever
 >>> Sentence: 0,Jean is really sad , yielded results (pos/neg): 0.35512/0.64488, prediction: neg
