@@ -17,7 +17,7 @@ protobuf==3.5.1
 pycorenlp==0.3.0
 requests>=2.20.0
 six==1.11.0
-tensorflow-gpu==1.1.0
+tensorflow-gpu==1.15.0
 tensorflow-tensorboard==0.4.0
 Unidecode==1.0.22
 urllib3==1.22
